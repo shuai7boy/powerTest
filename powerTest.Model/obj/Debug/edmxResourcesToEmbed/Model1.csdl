@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema xmlns="http://schemas.microsoft.com/ado/2008/09/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="Model1" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation">
+  <EntityContainer Name="Model1Container" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="UserInfo" EntityType="Model1.UserInfo" />
+    <EntitySet Name="UserAction" EntityType="Model1.UserAction" />
+    <EntitySet Name="ActionInfo" EntityType="Model1.ActionInfo" />
+    <EntitySet Name="RoleInfo" EntityType="Model1.RoleInfo" />
+    <AssociationSet Name="UserInfoUserAction" Association="Model1.UserInfoUserAction">
+      <End Role="UserInfo" EntitySet="UserInfo" />
+      <End Role="UserAction" EntitySet="UserAction" />
+    </AssociationSet>
+    <AssociationSet Name="ActionInfoUserAction" Association="Model1.ActionInfoUserAction">
+      <End Role="ActionInfo" EntitySet="ActionInfo" />
+      <End Role="UserAction" EntitySet="UserAction" />
+    </AssociationSet>
+    <AssociationSet Name="UserInfoRoleInfo" Association="Model1.UserInfoRoleInfo">
+      <End Role="UserInfo" EntitySet="UserInfo" />
+      <End Role="RoleInfo" EntitySet="RoleInfo" />
+    </AssociationSet>
+    <AssociationSet Name="RoleInfoActionInfo" Association="Model1.RoleInfoActionInfo">
+      <End Role="RoleInfo" EntitySet="RoleInfo" />
+      <End Role="ActionInfo" EntitySet="ActionInfo" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="UserInfo">
+    <Key>
+      <PropertyRef Name="UserId" />
+    </Key>
+    <Property Name="UserId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="UserName" Type="String" Nullable="false" Unicode="true" MaxLength="10" FixedLength="false" />
+    <Property Name="UserPwd" Type="String" Nullable="false" Unicode="false" FixedLength="false" MaxLength="50" />
+    <Property Name="IsDelete" Type="Boolean" Nullable="false" />
+    <Property Name="Remark" Type="String" Nullable="false" FixedLength="false" MaxLength="1000" />
+    <Property Name="SubBy" Type="Int32" Nullable="false" />
+    <Property Name="SubTime" Type="DateTime" Nullable="false" />
+    <NavigationProperty Name="UserAction" Relationship="Model1.UserInfoUserAction" FromRole="UserInfo" ToRole="UserAction" />
+    <NavigationProperty Name="RoleInfo" Relationship="Model1.UserInfoRoleInfo" FromRole="UserInfo" ToRole="RoleInfo" />
+  </EntityType>
+  <EntityType Name="UserAction">
+    <Key>
+      <PropertyRef Name="UserId" />
+      <PropertyRef Name="ActionId" />
+    </Key>
+    <Property Name="IsAllow" Type="Boolean" Nullable="false" />
+    <NavigationProperty Name="UserInfo" Relationship="Model1.UserInfoUserAction" FromRole="UserAction" ToRole="UserInfo" />
+    <Property Name="UserId" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="ActionInfo" Relationship="Model1.ActionInfoUserAction" FromRole="UserAction" ToRole="ActionInfo" />
+    <Property Name="ActionId" Type="Int32" Nullable="false" />
+  </EntityType>
+  <EntityType Name="ActionInfo">
+    <Key>
+      <PropertyRef Name="ActionId" />
+    </Key>
+    <Property Name="ActionId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="ActionTitle" Type="String" Nullable="false" MaxLength="10" FixedLength="false" />
+    <Property Name="ControllerName" Type="String" Nullable="false" FixedLength="false" MaxLength="50" />
+    <Property Name="ActionName" Type="String" Nullable="false" FixedLength="false" MaxLength="20" Unicode="false" />
+    <Property Name="IsDelete" Type="Boolean" Nullable="false" />
+    <Property Name="Remark" Type="String" Nullable="false" MaxLength="1000" FixedLength="false" />
+    <Property Name="SubBy" Type="Int32" Nullable="false" />
+    <Property Name="SubTime" Type="DateTime" Nullable="false" />
+    <NavigationProperty Name="UserAction" Relationship="Model1.ActionInfoUserAction" FromRole="ActionInfo" ToRole="UserAction" />
+    <NavigationProperty Name="RoleInfo" Relationship="Model1.RoleInfoActionInfo" FromRole="ActionInfo" ToRole="RoleInfo" />
+    <Property Name="IsMenu" Type="Boolean" Nullable="false" />
+    <Property Name="MenuIcon" Type="String" Nullable="false" FixedLength="false" Unicode="false" MaxLength="100" />
+  </EntityType>
+  <EntityType Name="RoleInfo">
+    <Key>
+      <PropertyRef Name="RoleId" />
+    </Key>
+    <Property Name="RoleId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="RoleName" Type="String" Nullable="false" MaxLength="10" FixedLength="false" />
+    <Property Name="IsDelete" Type="Boolean" Nullable="false" />
+    <Property Name="Remark" Type="String" Nullable="false" MaxLength="1000" FixedLength="false" />
+    <Property Name="SubBy" Type="Int32" Nullable="false" />
+    <Property Name="SubTime" Type="DateTime" Nullable="false" />
+    <NavigationProperty Name="UserInfo" Relationship="Model1.UserInfoRoleInfo" FromRole="RoleInfo" ToRole="UserInfo" />
+    <NavigationProperty Name="ActionInfo" Relationship="Model1.RoleInfoActionInfo" FromRole="RoleInfo" ToRole="ActionInfo" />
+  </EntityType>
+  <Association Name="UserInfoUserAction">
+    <End Type="Model1.UserInfo" Role="UserInfo" Multiplicity="1" />
+    <End Type="Model1.UserAction" Role="UserAction" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="UserInfo">
+        <PropertyRef Name="UserId" />
+      </Principal>
+      <Dependent Role="UserAction">
+        <PropertyRef Name="UserId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="ActionInfoUserAction">
+    <End Type="Model1.ActionInfo" Role="ActionInfo" Multiplicity="1" />
+    <End Type="Model1.UserAction" Role="UserAction" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="ActionInfo">
+        <PropertyRef Name="ActionId" />
+      </Principal>
+      <Dependent Role="UserAction">
+        <PropertyRef Name="ActionId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="UserInfoRoleInfo">
+    <End Type="Model1.UserInfo" Role="UserInfo" Multiplicity="*" />
+    <End Type="Model1.RoleInfo" Role="RoleInfo" Multiplicity="*" />
+  </Association>
+  <Association Name="RoleInfoActionInfo">
+    <End Type="Model1.RoleInfo" Role="RoleInfo" Multiplicity="*" />
+    <End Type="Model1.ActionInfo" Role="ActionInfo" Multiplicity="*" />
+  </Association>
+</Schema>

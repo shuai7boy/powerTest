@@ -1,0 +1,114 @@
+﻿@model powerTest.Model.ActionInfo
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Edit</title>
+    <script src="~/Controllers/jquery.min.js"></script>
+    <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script src="~/Controllers/jquery.easyui.min.js"></script>
+    <script src="~/Controllers/MyAjaxForm.js"></script>
+    <script>
+        $(function () {
+            if ($("#IsMenu").attr("checked")) {
+                $("#imgUpLoad").show();
+                $("#imgUpLoad td:last").append("<img src='@Model.MenuIcon' width='50px' heigth='50px' />");
+            } else {
+                $("#imgUpLoad").hide();
+            }
+           
+            $("#IsMenu").click(function () {
+                if (this.checked) {
+                    $("#imgUpLoad").show();
+                } else {
+                    $("#imgUpLoad").hide();
+                }
+                //$("#imgUpLoad").toggle();
+            });
+            $("#btnUploadIconImg").click(function () {
+                //第一件事：判断文件input标签中有没有文件
+                if ($("#iconInput").val()) {
+                    //让表单异步的提交到后台。
+                    $("#MenuAddFrm").ajaxSubmit({
+                        error: function (error) { alert(error); },
+                        url: '@Url.Action("ImageHandler", "ActionInfo")', /*设置post提交到的页面*/
+                        type: "post", /*设置表单以post方法提交*/
+                        dataType: "text", /*设置返回值类型为文本*/
+                        success: function (data) {
+                            if (data == "no") {
+                                $.messager.alert("错误消息", "请选择合法图片！");
+                                return;
+                            }
+                            $("#MenuIcon").val(data);
+                            $("#iconId").append("<img src='" + data + "' width='50px' heigth='50px' />");
+                            $("#iconInput").val("");
+                        }
+                    });
+                } else {
+                    $.messager.alert("错误消息", "请选择合法图片！");
+                }
+            });
+        })
+        function AfterEdit(_data) {
+            window.parent.AfterEdit(_data);
+        }
+        function Submit() {
+            $("form").submit();
+        }
+    </script>
+</head>
+<body>
+    <div>
+        @using (Ajax.BeginForm("Edit", "ActionInfo", new AjaxOptions()
+    {
+        OnSuccess = "AfterEdit"
+    },new { id = "MenuAddFrm", enctype = "multipart/form-data" }))
+        {
+            <table style="width:100%;">
+                <tr>
+                    <td width="100">编号:</td>
+                    <td>
+                        @Model.ActionId
+                    <input type="hidden" value="@Model.ActionId" name="ActionId" />
+                </td>
+            </tr>
+            <tr>
+                <td>权限名:</td>
+                <td>@Html.TextBoxFor(c => c.ActionTitle)</td>
+            </tr>
+            <tr>
+                <td>控制器名:</td>
+                <td>@Html.TextBoxFor(c => c.ControllerName)</td>
+            </tr>
+            <tr>
+                <td>行为名:</td>
+                <td>@Html.TextBoxFor(c => c.ActionName)</td>
+            </tr>
+            <tr>
+                <td>备注:</td>
+                <td>@Html.TextAreaFor(c => c.Remark)</td>
+            </tr>
+            <tr>
+                <td>菜单:</td>
+                <td>
+                    <input type="checkbox" id="IsMenu" value="1" name="Menu" @Html.Raw(@Model.IsMenu?"checked='checked'":"")/><label for="IsMenu">勾选为是</label>
+                </td>
+            </tr>
+            <tr id="imgUpLoad">
+                <td>选择图标:</td>
+                <td id="iconId">
+                  @Html.TextBoxFor(c => c.MenuIcon)<br />
+                    <input type="file" id="iconInput" name="iconImg" /><br />
+                    <input type="button" id="btnUploadIconImg" value="上传图标" />
+                </td>
+            </tr>
+        </table>
+        }
+    </div>
+</body>
+</html>

@@ -1,0 +1,254 @@
+﻿@model powerTest.Model.UserInfo
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link href="~/Controllers/themes/default/easyui.css" rel="stylesheet" />
+    <link href="~/Controllers/themes/icon.css" rel="stylesheet" />
+    <script src="~/Controllers/jquery.min.js"></script>
+    <script src="~/Controllers/jquery.easyui.min.js"></script>
+    <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+    <script>
+        $(function () {
+            datagridShow();
+            $("#addDiv").hide();
+            $("#editDiv").hide();
+            $("#setRole").hide();
+        });
+        function datagridShow()
+        {
+            $("#tt").datagrid({
+                url: '/Home/GetPageList',
+                title: '用户列表',
+                width: 700,
+                height: 400,
+                fitColumns: true,               
+                loadMsg: '正在加载用户的信息...',
+                pagination: true,
+                singleSelect: false,
+                pageSize: 10,
+                pageNumber: 1,
+                pageList: [10, 20, 30],
+                queryParams: {},
+                columns: [[
+                        { field: 'ck', checkbox: true, align: 'left', width: 50 },
+                        { field: 'UserId', title: '主键', width: 80 },
+                        { field: 'UserName', title: '用户名', width: 120 },
+                        { field: 'UserPwd', title: '密码', width: 120 },
+                        { field: 'Remark', title: '备注', width: 120 },                       
+                ]],
+                toolbar: [{
+                    id: 'toolbarAdd',
+                    text: '添加',
+                    iconCls: 'icon-add',
+                    handler: addShow
+                }, {
+                    id: 'toolbarEdit',
+                    text: '编辑',
+                    iconCls: 'icon-edit',
+                    handler: editShow
+                }, {
+                    id: 'toolbarRemove',
+                    text: '删除',
+                    iconCls: 'icon-remove',
+                    handler: RemoveShow
+                }, {
+                    id: 'toolbarRedo',
+                    text: '设置角色',
+                    iconCls: 'icon-redo',
+                    handler: SetRoleInfo
+                }],
+               
+            });
+        }
+        //设置角色后执行函数
+        function SetRoleAfter(_data) {
+            if (_data=="ok") {
+                $("#setRole").dialog("close");
+                $("#tt").datagrid("clearSelections");
+            } else {
+                $.messager.alert("提示!","添加角色失败，请稍后再试...");
+            }
+        }
+        //设置角色
+        function SetRoleInfo() {
+            var item = $("#tt").datagrid("getSelections");
+            if (item.length !=1) {
+                $.messager.alert("提示!", "请选择一个用户进行设置");
+                return;
+            }
+            var id = item[0]["UserId"];
+            $("#setRole iframe").attr("src", '@Url.Action("SetRoleinfo", "Home")?id=' + id);
+            $("#setRole").show();
+            $("#setRole").dialog({
+                title: "设置用户角色",
+                collapsible: true,
+                minimizable: true,
+                maximizable: true,
+                resizable: true,
+                scroll: false,
+                modal:true,
+                buttons: [{
+                    text: "保存设置",
+                    iconCls: "icon-add",
+                    handler: function () {
+                        $("#setRole iframe")[0].contentWindow.SetRoleInfoSub();
+                    }
+                }, {
+                    text: "取消",
+                    iconCls: "icon-cancel",
+                    handler: function () {
+                        $("#setRole").dialog("close");
+                    }
+                }]
+            });
+
+        }
+
+        //删除选中内容
+        function RemoveShow() {
+            var item = $("#tt").datagrid("getSelections");
+            if (item.length <= 0) {
+                $.messager.alert("提示!", "请选择一行或多行后再点击删除...");
+                return;
+            }
+            var strId = "";
+            for (var i = 0; i < item.length; i++) {
+                if (i == item.length - 1) {
+                    strId += item[i]["UserId"];
+                    break;
+                }
+                strId += item[i]["UserId"] + ",";
+            }
+            $.post('@Url.Action("Remove","Home")', { ids: strId }, function (_data) {
+                if (_data == "ok") {
+                    $("#tt").datagrid("reload");
+                    $("#tt").datagrid("clearSelections");
+                } else {
+                    $.messager.alert("提示!", "未能删除成功，请稍后再试...");
+                }
+            })
+        }
+        function editShow() {
+            var item = $("#tt").datagrid("getSelections");
+            if (item.length!=1) {
+                $.messager.alert("警告!", "请选择一行进行编辑");
+                return;
+            }
+            var id = item[0]["UserId"];           
+            $("#editDiv").show();
+            $("#editDiv iframe").attr("src", '@Url.Action("Index", "UserInfo")?id=' + id);
+            $("#editDiv").dialog({               
+                title: "编辑用户",
+                collapsible: true,
+                minimizable: true,
+                maximizable: true,
+                resizable: true,
+                scroll:false,
+                buttons: [{
+                    text: "保存修改",
+                    iconCls: "icon-add",
+                    handler: function () {
+                        $("#editDiv iframe")[0].contentWindow.EditSubmit();
+                    }
+                }, {
+                    text: "取消",
+                    iconCls: "icon-cancel",
+                    handler: function () {
+                        $("#editDiv").dialog("close");
+                    }
+                }]
+            });
+        }
+        function addShow() {
+            
+            //var tr = $("#addDiv").get(0).getElementsByTagName("tr");
+            //for (var i = 0; i < tr.length; i++) {
+            //   $(tr[i].getElementsByTagName("td")[1]).val("");
+            //}
+            //清空输入框内容
+            $("#addDiv input").val(""); 
+            $("#addDiv textarea").val("");
+            //------------------------
+            $("#addDiv").show();
+            $("#addDiv").dialog({
+                title: "添加用户",
+                collapsible: true,
+                minimizable: true,
+                maximizable: true,
+                resizable: true,
+                modal:true,
+                buttons: [{
+                    text: "添加",
+                    iconCls: "icon-add",
+                    handler: function () {
+                        $("#addDiv form").submit();
+                    }
+                }, {
+                    text: "取消",
+                    iconCls: "icon-cancel",
+                    handler: function () {
+                        $("#addDiv").dialog("close");
+                    }
+                }]
+            });
+        }
+        function addAfter(msg) {
+            if (msg == "ok") {
+                $("#addDiv").dialog("close");
+                $("#tt").datagrid("load");
+
+            } else {
+                alert(msg);
+            }
+        }
+        function editAfter(msg) {
+            if (msg=="ok") {
+                $("#editDiv").dialog("close");
+                $("#tt").datagrid("reload");
+                $("#tt").datagrid("clearSelections");
+            } else {
+                alert(msg);
+            }
+        }
+    </script>
+</head>
+<body>
+   <table id="tt"></table>
+   <div id="addDiv">
+       @using (Ajax.BeginForm("SetUserMsg", "Home", new AjaxOptions()
+       {
+           OnSuccess = "addAfter"
+       }))
+       {           
+        <table>
+            <tr>
+                <td>用户名:</td>
+                <td>@Html.TextBoxFor(c =>c.UserName)</td>
+            </tr>
+            <tr>
+                <td>密码:</td>
+                <td>@Html.PasswordFor(c=>c.UserPwd)</td>
+            </tr>
+            <tr>
+                <td>备注:</td>
+                <td id="areaId">@Html.TextAreaFor(c => c.Remark)</td>
+            </tr>
+        </table>
+       }
+   </div>
+    @*编辑用户界面*@
+    <div id="editDiv">
+        <iframe src="~/Login.html" id="frm1"></iframe>      
+    </div>
+    @*设置角色界面*@
+    <div id="setRole">
+        <iframe src="~/Login.html" id="frm2" frameborder="0" width="100%" height="100%"></iframe>     
+    </div>
+</body>
+</html>

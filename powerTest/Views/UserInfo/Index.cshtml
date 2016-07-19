@@ -1,0 +1,53 @@
+﻿@model powerTest.Model.UserInfo
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script src="~/Controllers/jquery.min.js"></script>
+    <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+    <script>
+        $(function () {
+
+        });
+        function editAfter(msg) {
+            window.parent.editAfter(msg);
+        }
+        function EditSubmit() {
+            $("form").submit();
+        }
+    </script>
+</head>
+<body>
+    <div>
+        @using (Ajax.BeginForm("EditHandler", "UserInfo", new AjaxOptions()
+        {
+            OnSuccess = "editAfter"
+        }))
+        {
+            <table>
+               
+                <tr>
+                    <input type="hidden" value="@Model.UserId" name="UserId" />
+                    <td>用户名:</td>
+                    <td>@Html.TextBoxFor(c => c.UserName)</td>
+                </tr>
+                <tr>
+                    <td>密码:</td>
+                    <td><input type="password" value="    " name="UserPwd">
+                        <input type="hidden" name="UserPwd2" value="@Model.UserPwd"></td>
+                </tr>
+                <tr>
+                    <td>备注:</td>
+                    <td>@Html.TextAreaFor(c => c.Remark)</td>
+                </tr>
+            </table>
+        }
+    </div>
+</body>
+</html>

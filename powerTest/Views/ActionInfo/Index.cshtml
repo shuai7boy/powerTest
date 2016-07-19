@@ -1,0 +1,262 @@
+﻿@model powerTest.Model.ActionInfo
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link href="~/Controllers/themes/default/easyui.css" rel="stylesheet" />
+    <link href="~/Controllers/themes/icon.css" rel="stylesheet" />
+    <script src="~/Controllers/jquery.min.js"></script>
+    <script src="~/Controllers/jquery.easyui.min.js"></script>
+    <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+    <script src="~/Controllers/MyAjaxForm.js"></script>
+    <script>
+        $(function () {
+            ActionShow();
+            $("#addDiv").hide();
+            $("#editDiv").hide();
+            $("#imgUpLoad").hide();
+            //是否为菜单权限
+            $("#IsMenu").click(function () {
+                if (this.checked) {
+                    $("#imgUpLoad").show();
+                } else {
+                    $("#imgUpLoad").hide();
+                }               
+            });
+            //异步上传图片 
+            //1.首先引入MyAjaxForm.js文件
+            bindImgUploadClick();
+        });
+        //异步上传图片
+        function bindImgUploadClick() {
+            $("#btnUploadIconImg").click(function () {
+                //第一件事：判断文件input标签中有没有文件
+                if ($("#iconInput").val()) {
+                    //让表单异步的提交到后台。
+                    $("#MenuAddFrm").ajaxSubmit({
+                        error: function (error) { alert(error); },
+                        url: '@Url.Action("ImageHandler", "ActionInfo")', /*设置post提交到的页面*/
+                        type: "post", /*设置表单以post方法提交*/
+                        dataType: "text", /*设置返回值类型为文本*/
+                        success: function (data) {
+                            if (data=="no") {
+                                $.messager.alert("错误消息", "请选择合法图片！");
+                                return;
+                            }
+                            $("#iconUrl").val(data);
+                            $("#iconId").append("<img src='" + data + "' width='50px' heigth='50px' />");
+                            $("#iconInput").val("");
+                        }
+                    });
+                } else {
+                    $.messager.alert("错误消息", "请选择合法图片！");
+                }
+            });
+        }
+
+        function ActionShow() {
+
+            $("#actionDiv").datagrid({
+                url: '/ActionInfo/GetPageList',
+                title: '权限列表',
+                width: 700,
+                height: 400,
+                fitColumns: true,
+                idField: 'ActionId',
+                loadMsg: '正在加载权限列表信息...',
+                pagination: true,
+                singleSelect: false,
+                pageSize: 10,
+                pageNumber: 1,
+                pageList: [10, 20, 30],
+                queryParams: {},
+                columns: [[
+						{ field: 'ck', checkbox: true, align: 'left', width: 50 },
+						{ field: 'ActionId', title: '主键', width: 80 },
+						{ field: 'ActionTitle', title: '权限名', width: 120 },
+						{ field: 'ControllerName', title: '控制器名', width: 120 },
+                        { field: 'ActionName', title: '行为名', width: 120 },
+                        { field: 'Remark', title: '备注', width: 120 },                        
+                        {
+                            field: 'IsMenu', title: '桌面菜单', width: 80, align: 'left',
+                            formatter: function (value, row, index) {
+                                return value ? "是" : "否";
+                            }
+                        }
+
+                ]],
+                toolbar: [{
+                    id: 'toolbarAdd',
+                    text: '添加',
+                    iconCls: 'icon-add',
+                    handler: AddShow
+                }, {
+                    id: 'toolbarEdit',
+                    text: '修改',
+                    iconCls: 'icon-edit',
+                    handler: EditShow
+                }, {
+                    id: 'toolbarRemove',
+                    text: '删除',
+                    iconCls: 'icon-remove',
+                    handler: DeleteShow
+                }]
+            });
+        }
+        //删除选中项
+        function DeleteShow() {
+            var item = $("#actionDiv").datagrid("getSelections");
+            if (item.length <= 0) {
+                $.messager.alert("提示!", "请选择一行或多行后再点击删除...");
+                return;
+            }
+            var strId = "";
+            for (var i = 0; i < item.length; i++) {
+                if (i == item.length - 1) {
+                    strId += item[i]["ActionId"];
+                    break;
+                }
+                strId += item[i]["ActionId"] + ",";
+            }
+            $.post('@Url.Action("Remove", "ActionInfo")', { ids: strId }, function (_data) {
+                if (_data == "ok") {
+                    $("#actionDiv").datagrid("reload");
+                    $("#actionDiv").datagrid("clearSelections");
+                } else {
+                    $.messager.alert("提示!", "未能删除成功，请稍后再试...");
+                }
+            })
+        }
+        //添加权限
+        function AddShow() {
+            //清空上次填写的内容
+            $("#addDiv input:not(#IsMenu,#btnUploadIconImg)").val("");
+            $("#addDiv textarea").val("");
+            $("#IsMenu").removeAttr("checked");
+            $("#iconId img").remove();
+            $("#imgUpLoad").hide();
+            //---------以上是清空 恢复初始状态代码
+            $("#addDiv").show();
+            $("#addDiv").dialog({
+                title: "添加权限",
+                collapsible: true,
+                minimizable: true,
+                maximizable: true,
+                resizable: true,
+
+                buttons: [{
+                    text: "添加",
+                    iconCls: "icon-add",
+                    handler: function () {
+                        $("#addDiv form").submit();
+                    }
+                }, {
+                    text: "取消",
+                    iconCls: "icon-cancel",
+                    handler: function () {
+                        $("#addDiv").dialog("close");
+                    }
+                }]
+            });
+        }
+        function AddAfter(_data) {
+            if (_data=="ok") {
+                $("#actionDiv").datagrid("load");
+                $("#addDiv").dialog("close");
+            } else {
+                $.messager.alert("警告!", _data);
+            }
+        }
+        //----修改权限
+        function EditShow() {
+            var item = $("#actionDiv").datagrid("getSelections");
+            if (item.length != 1) {
+                $.messager.alert("警告!", "请选择一行进行编辑");
+                return;
+            }
+            var id = item[0]["ActionId"];//获取要编辑的对象的id            
+            $("#editDiv").show();
+            $("#editDiv iframe").attr("src", '@Url.Action("Edit","ActionInfo")?id=' + id);//修改iframe嵌套路径
+
+            $("#editDiv").dialog({
+                title: "修改权限",
+                collapsible: true,
+                minimizable: true,
+                maximizable: true,
+                resizable: true,
+                modal: true,
+                width: 400,
+                height:356,
+                buttons: [{
+                    text: "保存修改",
+                    iconCls: "icon-add",
+                    handler: function () {
+                        $("#editDiv iframe")[0].contentWindow.Submit();
+                    }
+                }, {
+                    text: "取消",
+                    iconCls: "icon-cancel",
+                    handler: function () {
+                        $("#editDiv").dialog("close");
+                    }
+                }]
+            });
+        }
+        function AfterEdit(_data) {
+            if (_data=="ok") {
+                $("#actionDiv").datagrid("reload");
+                $("#editDiv").dialog("close");
+                $("#actionDiv").datagrid("clearSelections");
+            } else {
+                alert(_data);
+            }
+        }
+    </script>
+</head>
+<body>
+    <table id="actionDiv"></table>     
+    <div id="addDiv">
+        @using (Ajax.BeginForm("Add", "ActionInfo", new AjaxOptions()
+        {
+            OnSuccess = "AddAfter"
+        }, new { id = "MenuAddFrm", enctype = "multipart/form-data" }))
+        {
+            <table>
+                <tr>
+                    <td>权限名:</td><td>@Html.TextBoxFor(c => c.ActionTitle)</td>
+                </tr>
+                <tr>
+                    <td>控制器名:</td><td>@Html.TextBoxFor(c => c.ControllerName)</td>
+                </tr>
+                <tr>
+                    <td>行为名:</td><td>@Html.TextBoxFor(c => c.ActionName)</td>
+                </tr>
+                <tr>
+                    <td>备注:</td><td>@Html.TextAreaFor(c => c.Remark)</td>
+                </tr>
+                <tr>
+                    <td>菜单:</td>
+                    <td><input type="checkbox" id="IsMenu" value="1" name="Menu"/><label for="IsMenu">勾选为是</label></td>
+                </tr>
+                <tr id="imgUpLoad">
+                    <td>选择图标:</td>
+                    <td id="iconId">
+                        <input type="text" id="iconUrl" name="IconUrl" /><br />
+                        <input type="file" id="iconInput" name="iconImg" /><br />
+                        <input type="button" id="btnUploadIconImg" value="上传图标" />
+                    </td>
+                </tr>
+            </table>
+        }
+    </div>
+    <div id="editDiv">
+        <iframe src="~/Login.html" id="frm1" frameborder="0" style="width:100%;height:100%;"></iframe>
+    </div>
+</body>
+</html>

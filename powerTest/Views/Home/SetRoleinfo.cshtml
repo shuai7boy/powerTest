@@ -1,0 +1,65 @@
+﻿@model List<powerTest.Model.RoleInfo>
+@using powerTest.Model
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>SetRoleinfo</title>
+    <script src="~/Controllers/jquery.min.js"></script>
+    <script>
+        $(function () {
+
+        });
+        function SetRoleInfoSub() {
+            //获取要设置的用户的id
+            var userId1 = $("#UserId").val();
+            //获取选择的对象
+            var rids1 = '';
+            $(":checked").each(function () {
+                rids1 += $(this).val() + ',';
+            });
+            if (rids1=='') {
+                alert("请选择角色后再设置");
+                return;
+            }
+            rids1 = rids1.substring(0, rids1.length - 1);           
+            //
+            $.post('@Url.Action("SetRoleinfo","Home")', { userId: userId1, rids: rids1 }, function (_data) {
+                window.parent.SetRoleAfter(_data);
+            });
+        }
+    </script>
+</head>
+<body>
+    <div>
+       
+                        @{
+                            var userInfo=ViewBag.UserInfo as UserInfo;
+                            <input type="hidden" value="@userInfo.UserId" name="UserId" id="UserId">
+                            var items = Model.Count;
+
+                            for (int i = 0; i < items; i++)
+                            {
+                            <input type="checkbox" name="@Model[i].RoleId" id="@Model[i].RoleId" value="@Model[i].RoleId" 
+                                   @if (userInfo.RoleInfo.Contains(Model[i]))
+                                   {
+                                       @Html.Raw("checked='checked'")
+                                   }
+                                   />
+                        <label for="@Model[i].RoleId"> @Model[i].RoleName</label>
+                        if (i%3==0&&i!=0)
+                        {
+                        <br/><hr/>
+                        }
+                        }
+                    
+                }
+        
+    </div>
+</body>
+</html>

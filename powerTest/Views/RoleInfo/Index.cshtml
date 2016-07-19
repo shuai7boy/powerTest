@@ -1,0 +1,242 @@
+﻿@model powerTest.Model.RoleInfo
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link href="~/Controllers/themes/default/easyui.css" rel="stylesheet" />
+    <link href="~/Controllers/themes/icon.css" rel="stylesheet" />
+    <script src="~/Controllers/jquery.min.js"></script>
+    <script src="~/Controllers/jquery.easyui.min.js"></script>
+    <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+    <script>
+        $(function () {
+            RoleShow();
+            $("#addDiv").hide();
+            $("#editDiv").hide();
+            $("#setActionDiv").hide();
+        });
+        function RoleShow() {
+            $("#roleDiv").datagrid({
+                url: '/RoleInfo/GetPageList',
+                title: '角色列表',
+                width: 700,
+                height: 400,
+                fitColumns: true,
+                idField: 'RoleId',
+                loadMsg: '正在加载角色的信息...',
+                pagination: true,
+                singleSelect: false,
+                pageSize: 10,
+                pageNumber: 1,
+                pageList: [10, 20, 30],
+                queryParams: {},
+                columns: [[
+						{ field: 'ck', checkbox: true, align: 'left', width: 50 },
+                        { field: 'RoleId', title: '主键', width: 80 },
+						{ field: 'RoleName', title: '角色名称', width: 80 },
+						{ field: 'Remark', title: '备注', width: 120 },
+
+                ]],
+                toolbar: [{
+                    id: 'toolbarAdd',
+                    text: '添加',
+                    iconCls: 'icon-add',
+                    handler: AddShow
+                },
+                {
+                    id: 'toolbarEdit',
+                    text: '修改',
+                    iconCls: 'icon-edit',
+                    handler: EditShow
+                }, {
+                    id: 'toolbarRemove',
+                    text: '删除',
+                    iconCls: 'icon-remove',
+                    handler: RemoveShow
+                }, {
+                    id: 'toolbarRedo',
+                    text: '设置权限',
+                    iconCls: 'icon-redo',
+                    handler: SetActionInfo
+                }]
+            });
+        }
+       //给角色设置权限
+        function SetActionInfo() {
+            var item = $("#roleDiv").datagrid("getSelections");           
+            if (item.length != 1) {
+                $.messager.alert("提示!", "请选择一个角色进行设置");
+                return;
+            }
+            var id = item[0]["RoleId"];
+            $("#setActionDiv iframe").attr("src", '@Url.Action("SetAction", "RoleInfo")?id=' + id);
+            $("#setActionDiv").show();
+            $("#setActionDiv").dialog({
+                title: "设置角色权限",
+                collapsible: true,
+                minimizable: true,
+                maximizable: true,
+                resizable: true,
+                scroll: false,
+                modal: true,
+                buttons: [{
+                    text: "保存设置",
+                    iconCls: "icon-add",
+                    handler: function () {
+                        $("#setActionDiv iframe")[0].contentWindow.SetrActionInfoSub();
+                    }
+                }, {
+                    text: "取消",
+                    iconCls: "icon-cancel",
+                    handler: function () {
+                        $("#setActionDiv").dialog("close");
+                    }
+                }]
+            });
+
+        }
+        function SetActionAfter(_data)
+        {
+            if (_data=="ok") {
+                $("#setActionDiv").dialog("close");
+            } else {
+                $.messager.alert("提示!","添加权限失败，请稍后再试");
+            }
+        }
+        function AddShow()
+        {
+            //清空之前输入内容
+            $("#addDiv input").val("");
+            //-------以上是清空代码
+            $("#addDiv").show();
+            $("#addDiv").dialog({
+                title: "添加角色",
+                collapsible: true,
+                minimizable: true,
+                maximizable: true,
+                resizable: true,
+                modal: true,
+                buttons: [{
+                    text: "添加",
+                    iconCls: "icon-add",
+                    handler: function () {
+                        $("#addDiv form").submit();
+                    }
+                }, {
+                    text: "取消",
+                    iconCls: "icon-cancel",
+                    handler: function () {
+                        $("#addDiv").dialog("close");
+                    }
+                }]
+            });
+        }
+        function AddAfter(_data) {
+            if (_data=="ok") {
+                $("#roleDiv").datagrid("load");
+                $("#addDiv").dialog("close");
+                $("#roleDiv").datagrid("clearSelections");
+            } else {
+                $.messager.alert("提示!",_data);
+            }
+        }
+        function EditShow() {           
+            var item1 = $("#roleDiv").datagrid("getSelections");
+            if (item1.length!= 1) {
+                $.messager.alert("警告!", "请选择一行进行编辑");
+                return;
+            }
+            var id = item1[0]["RoleId"];
+            $("#editDiv iframe").attr("src", '@Url.Action("Edit","RoleInfo")?id='+id);
+            $("#editDiv").show();
+            $("#editDiv").dialog({
+                title: "编辑角色",
+                collapsible: true,
+                minimizable: true,
+                maximizable: true,
+                resizable: true,
+                modal:true,
+                buttons: [{
+                    text: "保存修改",
+                    iconCls: "icon-add",
+                    handler: function () {                                     
+                        $("#editDiv iframe")[0].contentWindow.EditSubmit();                       
+                    }
+                }, {
+                    text: "取消",
+                    iconCls: "icon-cancel",
+                    handler: function () {
+                        $("#editDiv").dialog("close");
+                    }
+                }]
+            });
+        }
+        function EditAfter(_data) {
+            if (_data == "ok") {
+                $("#roleDiv").datagrid("reload");
+                $("#editDiv").dialog("close");
+                $("#roleDiv").datagrid("clearSelections");
+            } else {
+                $.messager.alert("警告!",_data);
+            }
+        }
+        function RemoveShow() {           
+            var item = $("#roleDiv").datagrid("getSelections");
+            if (item.length<=0) {
+                $.messager.alert("提示!", "请选择一行或多行后再点击删除...");
+                return;
+            }
+            var strId="";
+            for (var i = 0; i < item.length; i++) {
+                if (i == item.length - 1) {
+                    strId += item[i]["RoleId"];
+                    break;
+                }
+                strId += item[i]["RoleId"] + ",";            
+            }                       
+            $.post('@Url.Action("Remove","RoleInfo")', { ids: strId }, function (_data) {
+                if (_data == "ok") {
+                    $("#roleDiv").datagrid("reload");
+                    $("#roleDiv").datagrid("clearSelections");
+                } else {
+                    $.messager.alert("提示!", "未能删除成功，请稍后再试...");
+                }
+            })
+        }
+    </script>
+</head>
+<body>
+    <div id="roleDiv"> </div>     
+    <!--添加角色-->
+   <div id="addDiv">
+       @using (Ajax.BeginForm("Add", "RoleInfo", new AjaxOptions()
+       {
+           OnSuccess = "AddAfter"
+       }))
+       {
+        <table>
+            <tr>
+                <td>角色名称:</td><td>@Html.TextBoxFor(c=>c.RoleName)</td>
+            </tr>
+            <tr>
+                <td>备注:</td><td>@Html.TextAreaFor(c=>c.Remark)</td>
+            </tr>
+        </table>
+       }
+   </div>
+    <!--修改角色-->
+    <div id="editDiv">
+        <iframe src="~/Login.html" frameborder="0" width="100%" height="100%"></iframe>
+    </div>
+    <!--设置权限-->
+    <div id="setActionDiv">
+        <iframe src="~/Login.html" frameborder="0" width="100%" height="100%"></iframe>
+    </div>
+</body>
+</html>

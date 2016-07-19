@@ -1,0 +1,10 @@
+G:\代码存放\Asp\powerTest\powerTest.IDAL\bin\Debug\powerTest.IDAL.dll
+G:\代码存放\Asp\powerTest\powerTest.IDAL\bin\Debug\powerTest.IDAL.pdb
+G:\代码存放\Asp\powerTest\powerTest.IDAL\obj\Debug\powerTest.IDAL.csprojResolveAssemblyReference.cache
+G:\代码存放\Asp\powerTest\powerTest.IDAL\obj\Debug\powerTest.IDAL.dll
+G:\代码存放\Asp\powerTest\powerTest.IDAL\obj\Debug\powerTest.IDAL.pdb
+G:\代码存放\Asp\powerTest\powerTest.IDAL\bin\Debug\powerTest.Model.dll
+G:\代码存放\Asp\powerTest\powerTest.IDAL\bin\Debug\EntityFramework.dll
+G:\代码存放\Asp\powerTest\powerTest.IDAL\bin\Debug\powerTest.Model.pdb
+G:\代码存放\Asp\powerTest\powerTest.IDAL\bin\Debug\EntityFramework.xml
+G:\代码存放\Asp\powerTest\powerTest.IDAL\bin\Debug\zh-Hans\EntityFramework.resources.dll

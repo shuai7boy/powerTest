@@ -1,0 +1,46 @@
+﻿@model powerTest.Model.RoleInfo
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Edit</title>
+    <script src="~/Controllers/jquery.min.js"></script>
+    <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script>
+        $(function () {
+
+        })
+        function EditSubmit() {
+            $("form").submit();
+        }
+        function EditAfter(_data) {
+            window.parent.EditAfter(_data);
+        }
+    </script>
+</head>
+<body>
+   
+       @using (Ajax.BeginForm("EditHandler", "RoleInfo", new AjaxOptions()
+       {
+     OnSuccess="EditAfter"
+       })) { 
+        <table>
+            <tr>
+                <td>编号:</td><td>@Model.RoleId
+                                <input type="hidden" value="@Model.RoleId" name="RoleId"/></td>
+            </tr>
+            <tr>
+                <td>角色名:</td><td>@Html.TextAreaFor(c=>c.RoleName)</td>
+            </tr>
+            <tr>
+                <td>备注:</td><td>@Html.TextAreaFor(c=>c.Remark)</td>
+            </tr>
+        </table>
+       }
+</body>
+</html>

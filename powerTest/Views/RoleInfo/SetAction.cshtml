@@ -1,0 +1,61 @@
+﻿@model List<powerTest.Model.ActionInfo>
+@using powerTest.Model           
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>SetAction</title>
+    <script src="~/Controllers/jquery.min.js"></script>
+    <script>
+        $(function () {
+
+        });
+        function SetrActionInfoSub()
+        {
+            //获取要设置的角色的id
+            var userId1 = $("#RoleId").val();
+            //获取选择的对象
+            var rids1 = '';
+            $(":checked").each(function () {
+                rids1 += $(this).val() + ',';
+            });
+            if (rids1 == '') {
+                alert("请选择权限后再设置");
+                return;
+            }
+            rids1 = rids1.substring(0, rids1.length - 1);
+            //
+            $.post('@Url.Action("SetAction", "RoleInfo")', { rid: userId1, aids: rids1 }, function (_data) {
+                window.parent.SetActionAfter(_data);
+            });
+        }
+    </script>
+</head>
+<body>
+    <div>
+        @{
+            var roleInfo = ViewBag.RoleInfo as RoleInfo;
+            <input type="hidden" value="@roleInfo.RoleId" name="RoleId" id="RoleId">
+            var items = Model.Count;
+
+            for (int i = 0; i < items; i++)
+            {
+                <input type="checkbox" name="@Model[i].ActionId" id="@Model[i].ActionId" value="@Model[i].ActionId"
+                       @if (roleInfo.ActionInfo.Contains(Model[i]))
+                       { @Html.Raw("checked='checked'")  } />
+                <label for="@Model[i].ActionId"> @Model[i].ActionTitle</label>
+                if (i % 3 == 0 && i != 0)
+                {
+                    <br /><hr />
+                }
+            }
+
+        }
+    </div>
+</body>
+</html>

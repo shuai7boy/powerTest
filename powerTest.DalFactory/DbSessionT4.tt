@@ -1,0 +1,43 @@
+﻿<#@ template language="C#" debug="false" hostspecific="true"#>
+<#@ include file="EF.Utility.CS.ttinclude"#><#@
+ output extension=".cs"#>
+ 
+<#
+
+CodeGenerationTools code = new CodeGenerationTools(this);
+MetadataLoader loader = new MetadataLoader(this);
+CodeRegion region = new CodeRegion(this, 1);
+MetadataTools ef = new MetadataTools(this);
+//修改当前tt模板相对应的edmx模型的位置
+string inputFile = @"..\\powerTest.Model\\Model1.edmx";
+
+EdmItemCollection ItemCollection = loader.CreateEdmItemCollection(inputFile);
+string namespaceName = code.VsNamespaceSuggestion();
+
+EntityFrameworkTemplateFileManager fileManager = EntityFrameworkTemplateFileManager.Create(this);
+
+#>
+using powerTest.Model;
+using powerTest.DAL;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data.Entity;
+using powerTest.IDAL;
+namespace powerTest.DalFactory
+{
+    public partial class DbSession:IDbSession
+    {
+        
+<#  
+    foreach(EntityType item in ItemCollection.GetItems<EntityType>())
+    {
+#>
+		public I<#=item.Name#>Dal Get<#=item.Name#>Dal()
+        {
+            return  new <#=item.Name#>Dal();
+        }
+<#}#>
+	}
+}

@@ -1,0 +1,15 @@
+G:\代码存放\Asp\powerTest\powerTest.DalFactory\bin\Debug\powerTest.DalFactory.dll.config
+G:\代码存放\Asp\powerTest\powerTest.DalFactory\bin\Debug\powerTest.DalFactory.dll
+G:\代码存放\Asp\powerTest\powerTest.DalFactory\bin\Debug\powerTest.DalFactory.pdb
+G:\代码存放\Asp\powerTest\powerTest.DalFactory\bin\Debug\EntityFramework.dll
+G:\代码存放\Asp\powerTest\powerTest.DalFactory\bin\Debug\powerTest.DAL.dll
+G:\代码存放\Asp\powerTest\powerTest.DalFactory\bin\Debug\powerTest.IDAL.dll
+G:\代码存放\Asp\powerTest\powerTest.DalFactory\bin\Debug\powerTest.Model.dll
+G:\代码存放\Asp\powerTest\powerTest.DalFactory\bin\Debug\powerTest.DAL.pdb
+G:\代码存放\Asp\powerTest\powerTest.DalFactory\bin\Debug\powerTest.IDAL.pdb
+G:\代码存放\Asp\powerTest\powerTest.DalFactory\bin\Debug\powerTest.Model.pdb
+G:\代码存放\Asp\powerTest\powerTest.DalFactory\bin\Debug\EntityFramework.xml
+G:\代码存放\Asp\powerTest\powerTest.DalFactory\bin\Debug\zh-Hans\EntityFramework.resources.dll
+G:\代码存放\Asp\powerTest\powerTest.DalFactory\obj\Debug\powerTest.DalFactory.csprojResolveAssemblyReference.cache
+G:\代码存放\Asp\powerTest\powerTest.DalFactory\obj\Debug\powerTest.DalFactory.dll
+G:\代码存放\Asp\powerTest\powerTest.DalFactory\obj\Debug\powerTest.DalFactory.pdb

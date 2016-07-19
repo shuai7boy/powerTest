@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<objects xmlns="http://www.springframework.net">
+  <object type="powerTest.Controllers.HomeController,powerTest"  singleton="false">
+    <property name="UserInfoBLL" ref="UserInfoBLL1"/>
+    <property name="RoleInfoBLL" ref="RoleInfoBLL1"/>
+  </object>  
+  <object type="powerTest.Controllers.UserInfoController,powerTest"  singleton="false">
+    <property name="UserInfoBLL" ref="UserInfoBLL1"/>
+  </object>
+  <object type="powerTest.Controllers.RoleInfoController,powerTest"  singleton="false">
+    <property name="RoleInfoBLL" ref="RoleInfoBLL1"/>
+    <property name="ActionInfoBLL" ref="ActionInfoBLL1"/>
+  </object>
+  <object type="powerTest.Controllers.ActionInfoController,powerTest"  singleton="false">
+    <property name="ActionInfoBLL" ref="ActionInfoBLL1"/>
+  </object> 
+ <object type="powerTest.Controllers.MainController,powerTest"  singleton="false">
+    <property name="ActionInfoBLL" ref="ActionInfoBLL1"/>
+  </object> 
+</objects>
